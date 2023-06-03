@@ -1,0 +1,4 @@
+name: RPCharacterPlugin
+version: '${project.version}'
+main: me.arahis.rpcharacter.RPCharacterPlugin
+api-version: 1.19
