@@ -5,6 +5,9 @@ import me.arahis.rpcharacter.database.DatabaseHandler;
 import me.arahis.rpcharacter.models.Character;
 import me.arahis.rpcharacter.models.RPPlayer;
 import me.arahis.rpcharacter.utils.Refactor;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
 import net.skinsrestorer.api.PlayerWrapper;
 import net.skinsrestorer.api.SkinVariant;
 import net.skinsrestorer.api.exception.SkinRequestException;
@@ -26,12 +29,13 @@ public class CharSetSkinCommand implements CommandExecutor {
             return true;
         }
 
+        RPCharacterPlugin plugin = RPCharacterPlugin.getPlugin();
+
         if(args.length < 3) {
-            Refactor.sendMessageFromConfig(sender, "wrong-usage");
+            Refactor.sendMessage(sender, String.format(plugin.getConfig().getString("wrong-usage"), command.getUsage()));
             return true;
         }
 
-        RPCharacterPlugin plugin = RPCharacterPlugin.getPlugin();
         DatabaseHandler handler = plugin.getDatabaseHandler();
         int limit = plugin.getConfig().getInt("limit");
 
@@ -99,7 +103,12 @@ public class CharSetSkinCommand implements CommandExecutor {
                     // Скин персонажа #%d %s был изменен по ссылке
                     // url
                     Refactor.sendMessage(player, String.format(plugin.getConfig().getString("skin-updated-by-url"), id, character.getCharName()));
-                    Refactor.sendMessage(player, args[2]);
+                    player.spigot().sendMessage(new ComponentBuilder(args[2])
+                            .event(new ClickEvent(ClickEvent.Action.OPEN_URL, args[2]))
+                            .event(new HoverEvent(HoverEvent.Action.SHOW_ITEM, new ComponentBuilder("Нажмите, чтобы открыть ссылку").create()))
+                            .underlined(true)
+                            .create()
+                    );
 
                     RPPlayer rpPlayer = handler.getRPPlayer(player);
                     if(rpPlayer.getSelectedChar() == id) {
