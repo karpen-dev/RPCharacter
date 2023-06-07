@@ -16,7 +16,7 @@ public class DataSource {
     private static String database = RPCharacterPlugin.getPlugin().getConfig().getString("mysql.database");
     private static String username = RPCharacterPlugin.getPlugin().getConfig().getString("mysql.username");
     private static String password = RPCharacterPlugin.getPlugin().getConfig().getString("mysql.password");
-    private static String url = "jdbc:mysql://" + host + ":" + port + ":" + database;
+    private static String url = "jdbc:mysql://" + host + ":" + port + "/" + database;
 
     static {
         config.setJdbcUrl(url);
