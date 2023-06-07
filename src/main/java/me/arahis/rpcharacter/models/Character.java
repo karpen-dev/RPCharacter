@@ -9,8 +9,9 @@ public class Character {
     private String propertyName;
     private String propertyValue;
     private String propertySignature;
+    private int charId;
 
-    public Character(Long id, String ownerName, String ownerUUID, String charRole, String charName, String propertyName, String propertyValue, String propertySignature) {
+    public Character(Long id, String ownerName, String ownerUUID, String charRole, String charName, String propertyName, String propertyValue, String propertySignature, int charId) {
         this.id = id;
         this.ownerName = ownerName;
         this.ownerUUID = ownerUUID;
@@ -19,6 +20,7 @@ public class Character {
         this.propertyName = propertyName;
         this.propertyValue = propertyValue;
         this.propertySignature = propertySignature;
+        this.charId = charId;
     }
 
     public Character(String ownerName, String ownerUUID, String charRole, String charName, String propertyName, String propertyValue, String propertySignature) {
@@ -26,6 +28,14 @@ public class Character {
         this.ownerUUID = ownerUUID;
         this.charRole = charRole;
         this.charName = charName;
+    }
+
+    public int getCharId() {
+        return charId;
+    }
+
+    public void setCharId(int charId) {
+        this.charId = charId;
     }
 
     public Long getId() {
