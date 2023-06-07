@@ -2,3 +2,12 @@ name: RPCharacterPlugin
 version: '${project.version}'
 main: me.arahis.rpcharacter.RPCharacterPlugin
 api-version: 1.19
+commands:
+  createchar:
+    description: Создает персонажа
+    usage: /createchar <роль> [имя]
+    aliases:
+      - crch
+  charsetskin:
+    description: Изменяет скин выбранного персонажа
+    usage: /charsetskin <format[nick/url]> <id> <nick/url> <classic/slim>
