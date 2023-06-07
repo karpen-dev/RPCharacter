@@ -2,12 +2,17 @@ package me.arahis.rpcharacter.commands;
 
 import me.arahis.rpcharacter.RPCharacterPlugin;
 import me.arahis.rpcharacter.database.DatabaseHandler;
+import me.arahis.rpcharacter.models.Character;
 import me.arahis.rpcharacter.utils.Refactor;
+import net.skinsrestorer.api.property.IProperty;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+
+import java.sql.SQLException;
 
 public class CreateCharCommand implements CommandExecutor {
 
@@ -35,10 +40,41 @@ public class CreateCharCommand implements CommandExecutor {
             return true;
         }
 
-        // /createchar <имя> <роль>
+        // /createchar <роль> <имя>
 
-        String name = args[0];
+        String role = args[0];
+        StringBuilder sb = new StringBuilder();
+        for(int i = 1; i < args.length; i++) {
+            sb.append(args[i]).append(" ");
+        }
+        String name = sb.toString().trim();
 
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            IProperty property = plugin.getSkinsRestorerAPI().getSkinData(player.getName());
+
+            Character character = new Character(
+                    (long) (handler.getLastCharId() + 1),
+                    player.getName(),
+                    player.getUniqueId().toString(),
+                    role,
+                    name,
+                    property.getName(),
+                    property.getValue(),
+                    property.getSignature(),
+                    handler.getLastCharIdByPlayer(player) + 1);
+            try {
+                handler.createChar(character);
+            } catch (SQLException e) {
+                Refactor.sendFormattedWarn("%s's character %s wasn't saved successfully", character.getOwnerName(), character.getCharName());
+                Refactor.sendMessage(player, "Ошибка подключения к базе данных! Создайте тикет в поддержке");
+                e.printStackTrace();
+                return;
+            }
+
+
+            // Вы создали персонажа [%s] %s с номером %d
+            Refactor.sendMessage(player, String.format(plugin.getConfig().getString("char-created"), role, name, character.getCharId()));
+        });
 
         return true;
     }
