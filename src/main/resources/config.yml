@@ -1,3 +1,7 @@
+# MySQL or JSON
+database-type: JSON
+
+# will be ignored, if database-type is JSON
 mysql:
   host: ""
   port: ""
@@ -9,14 +13,30 @@ prefix: "&b[Etta] &r"
 
 debug: true
 
-char-created: "Вы создали персонажа [%s] %s с номером %d"
+# {role} - роль персонажа, {name} - имя персонажа, {realname} - настоящее имя игрока
+name-in-chat: "[{role}] {name}"
+
+# highly recommend DO NOT CHANGE THIS
+# because of my stupidity, i forgot that someone except me will use
+# this plugin, and didn't properly put placeholders for messages
+# i don't want to fix this(maybe in future)
 no-permission: "У вас недостаточно прав"
 wrong-usage: "Неверное использование команды!%nПопробуйте: %s"
 only-for-players: "Команда доступна только игрокам"
+id-should-be-number: "ID должно быть числом"
+db-con-error: "Ошибка подключения к базе данных! Создайте тикет в поддержке"
+menu-exception: "Ошибка подключения к меню! Создайте тикет в поддержке"
 
 skin-updated-by-nick: "Скин персонажа #%d %s был изменен по нику %s"
 skin-updated-by-url: "Скин персонажа #%d %s был изменен по ссылке"
 skin-not-found: "Скин игрока %s не найден!"
+
+role-updated: "Роль персонажа #%d %s была изменена на %s"
+
+char-not-found: "Персонаж с номером %d не найден!"
+char-created: "Персонаж #%d [%s] %s был создан"
+char-selected: "Персонаж #%d [%s] %s был выбран"
+char-deleted: "Персонаж #%d [%s] %s был удален"
 
 limit-of-characters: "Вы превысили лимит персонажей!"
 
