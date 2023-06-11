@@ -1,7 +1,8 @@
 package me.arahis.rpcharacter.listeners;
 
 import me.arahis.rpcharacter.RPCharacterPlugin;
-import me.arahis.rpcharacter.database.DatabaseHandler;
+import me.arahis.rpcharacter.database.IDataHandler;
+import me.arahis.rpcharacter.database.SavingType;
 import me.arahis.rpcharacter.models.Character;
 import me.arahis.rpcharacter.models.RPPlayer;
 import me.arahis.rpcharacter.utils.Refactor;
@@ -22,13 +23,13 @@ public class JoinListener implements Listener {
         Player player = event.getPlayer();
 
         RPCharacterPlugin plugin = RPCharacterPlugin.getPlugin();
-        DatabaseHandler handler = plugin.getDatabaseHandler();
+        IDataHandler handler = plugin.getDataHandler();
 
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
 
             if (handler.getRPPlayer(player) == null) {
                 try {
-                    handler.createRPPlayer(new RPPlayer(player.getUniqueId().toString(), player.getName(), 1, 1));
+                    handler.saveRPPlayer(new RPPlayer(player.getUniqueId().toString(), player.getName(), 1, 1), SavingType.SAVE);
                 } catch (SQLException e) {
                     Refactor.sendFormattedWarn("RPPlayer %s wasn't saved successfully", player.getName());
                     e.printStackTrace();
@@ -39,7 +40,7 @@ public class JoinListener implements Listener {
 
             if(handler.getCharacter(player, 1) == null) {
                 try {
-                    handler.createChar(new Character(
+                    handler.saveCharacter(new Character(
                             (long) handler.getLastCharId() + 1,
                             player.getName(),
                             player.getUniqueId().toString(),
@@ -49,7 +50,7 @@ public class JoinListener implements Listener {
                             property.getValue(),
                             property.getSignature(),
                             1
-                    ));
+                    ), SavingType.SAVE);
                 } catch (SQLException e) {
                     Refactor.sendFormattedWarn("%s's character #%d %s wasn't successfully saved", player.getName(), 1, player.getName());
                     e.printStackTrace();
