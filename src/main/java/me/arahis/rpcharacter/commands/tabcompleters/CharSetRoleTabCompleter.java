@@ -29,7 +29,7 @@ public class CharSetRoleTabCompleter implements TabCompleter {
 
         List<String> ids = new ArrayList<>();
 
-        for(int i = 0; i <= getAmount(); i++) {
+        for(int i = 1; i <= getAmount(); i++) {
             ids.add(String.valueOf(i));
         }
 
@@ -37,7 +37,7 @@ public class CharSetRoleTabCompleter implements TabCompleter {
             return Refactor.getPartialMatches(args[0], ids);
         }
 
-        return null;
+        return new ArrayList<>();
     }
 
     public int getAmount() {
