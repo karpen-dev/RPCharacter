@@ -2,6 +2,7 @@ package me.arahis.rpcharacter.menu;
 
 import me.arahis.rpcharacter.RPCharacterPlugin;
 import me.arahis.rpcharacter.database.IDataHandler;
+import me.arahis.rpcharacter.database.SavingType;
 import me.arahis.rpcharacter.models.Character;
 import me.arahis.rpcharacter.models.RPPlayer;
 import me.arahis.rpcharacter.utils.Refactor;
@@ -13,6 +14,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+
+import java.sql.SQLException;
 
 public class ConfirmCharDeletionMenu extends Menu {
 
@@ -49,18 +52,26 @@ public class ConfirmCharDeletionMenu extends Menu {
                 int id = playerMenuUtility.getData("charid", Integer.class);
 
                 Character character = handler.getCharacter(p, id);
+                String charName = character.getCharName();
+                String charRole = character.getCharRole();
                 RPPlayer rpPlayer = handler.getRPPlayer(p);
 
                 if(rpPlayer.getSelectedChar() == id) {
                     handler.replaceCharacter(plugin, p, rpPlayer, handler);
                 }
+                rpPlayer.setAmountOfChars(rpPlayer.getAmountOfChars() - 1);
+                try {
+                    handler.saveRPPlayer(rpPlayer, SavingType.UPDATE);
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
 
                 handler.deleteCharacter(p, playerMenuUtility.getData("charid", Integer.class));
-
                 // Персонаж #%d [%s] %s был удален
-                Refactor.sendMessage(p, String.format(plugin.getConfig().getString("char-deleted"), character.getCharId(), character.getCharRole(), character.getCharName()));
+                Refactor.sendMessage(p, String.format(plugin.getConfig().getString("char-deleted"), id, charRole, charName));
 
             });
+            p.closeInventory();
             return;
         }
 
