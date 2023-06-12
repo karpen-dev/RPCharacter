@@ -1,10 +1,20 @@
 package me.arahis.rpcharacter.utils;
 
 import me.arahis.rpcharacter.RPCharacterPlugin;
+import me.arahis.rpcharacter.models.Character;
+import me.clip.placeholderapi.PlaceholderAPI;
+import net.skinsrestorer.api.PlayerWrapper;
+import net.skinsrestorer.api.property.IProperty;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.util.StringUtil;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class Refactor {
 
@@ -53,14 +63,35 @@ public class Refactor {
         }
     }
 
-    public static boolean isInt(String toCheck) {
+    public static String stringBuilder(String[] args, int startPos) {
+        StringBuilder sb = new StringBuilder();
+        for(int i = startPos; i < args.length; i++) {
+            sb.append(args[i]).append(" ");
+        }
+        return sb.toString().trim();
+    }
+
+    public static boolean isNotANumber(String toCheck) {
         try {
             Integer.parseInt(toCheck);
-            return true;
-        } catch (NumberFormatException e) {
-            e.printStackTrace();
             return false;
+        } catch (NumberFormatException e) {
+            return true;
         }
+    }
+
+    public static void setDisplayName(Player player, Character character) {
+        player.setDisplayName(PlaceholderAPI.setPlaceholders(player, color(RPCharacterPlugin.getPlugin().getConfig().getString("name-in-chat").replace("{role}", character.getCharRole()).replace("{name}", character.getCharName()).replace("{realname}", player.getName()))));
+    }
+
+    public static void setCharacterToPlayer(Player player, Character character) {
+        IProperty property = RPCharacterPlugin.getPlugin().getSkinsRestorerAPI().createPlatformProperty(character.getPropertyName(), character.getPropertyValue(), character.getPropertySignature());
+        RPCharacterPlugin.getPlugin().getSkinsRestorerAPI().applySkin(new PlayerWrapper(player), property);
+        setDisplayName(player, character);
+    }
+
+    public static List<String> getPartialMatches(String arg, List<String> options) {
+        return StringUtil.copyPartialMatches(arg, options.stream().filter(Objects::nonNull).collect(Collectors.toList()), new ArrayList<>());
     }
 
 
