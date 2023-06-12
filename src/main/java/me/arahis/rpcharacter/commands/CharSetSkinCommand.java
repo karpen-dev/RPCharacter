@@ -1,7 +1,8 @@
 package me.arahis.rpcharacter.commands;
 
 import me.arahis.rpcharacter.RPCharacterPlugin;
-import me.arahis.rpcharacter.database.DatabaseHandler;
+import me.arahis.rpcharacter.database.IDataHandler;
+import me.arahis.rpcharacter.database.SavingType;
 import me.arahis.rpcharacter.models.Character;
 import me.arahis.rpcharacter.models.RPPlayer;
 import me.arahis.rpcharacter.utils.Refactor;
@@ -18,6 +19,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+
+import java.sql.SQLException;
 
 public class CharSetSkinCommand implements CommandExecutor {
 
@@ -36,13 +39,13 @@ public class CharSetSkinCommand implements CommandExecutor {
             return true;
         }
 
-        DatabaseHandler handler = plugin.getDatabaseHandler();
+        IDataHandler handler = plugin.getDataHandler();
         int limit = plugin.getConfig().getInt("limit");
 
         Player player = (Player) sender;
 
-        if(!Refactor.isInt(args[1])) {
-            Refactor.sendMessage(player, String.format(plugin.getConfig().getString("wrong-usage"), command.getUsage()));
+        if(Refactor.isNotANumber(args[1])) {
+            Refactor.sendMessageFromConfig(player, "id-should-be-number");
             return true;
         }
 
@@ -64,11 +67,23 @@ public class CharSetSkinCommand implements CommandExecutor {
 
                 Character character = handler.getCharacter(player, id);
 
+                if(character == null) {
+                    // Персонаж с номером %d не найден!
+                    Refactor.sendMessage(player, String.format(plugin.getConfig().getString("char-not-found"), id));
+                    return;
+                }
+
                 character.setPropertyName(property.getName());
                 character.setPropertyValue(property.getValue());
                 character.setPropertySignature(property.getSignature());
 
-                handler.updateCharacter(character);
+                try {
+                    handler.saveCharacter(character, SavingType.UPDATE);
+                } catch (SQLException e) {
+                    Refactor.sendFormattedWarn("%s's character #%d %s wasn't successfully updated", character.getOwnerName(), character.getCharId(), character.getOwnerName());
+                    Refactor.sendMessageFromConfig(player, "db-con-error");
+                    return;
+                }
                 Refactor.sendFormattedInfo("Skin updated by nickname to %s's skin", args[2]);
 
                 // Скин персонажа #%d %s был изменен по нику %s
@@ -96,7 +111,13 @@ public class CharSetSkinCommand implements CommandExecutor {
                     character.setPropertyValue(property.getValue());
                     character.setPropertySignature(property.getSignature());
 
-                    handler.updateCharacter(character);
+                    try {
+                        handler.saveCharacter(character, SavingType.UPDATE);
+                    } catch (SQLException e) {
+                        Refactor.sendFormattedWarn("%s's character #%d %s wasn't successfully updated", character.getOwnerName(), character.getCharId(), character.getOwnerName());
+                        Refactor.sendMessageFromConfig(player, "db-con-error");
+                        return;
+                    }
                     Refactor.sendInfo("Skin updated by url: " + args[2]);
                     Refactor.sendInfo("Skin variant: " + args[3].toUpperCase());
 

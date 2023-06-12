@@ -90,6 +90,11 @@ public class CharacterSelectionMenu extends Menu {
 
         if(e.isRightClick() && e.isShiftClick()) {
 
+            if(item.getItemMeta().getPersistentDataContainer().get(key, PersistentDataType.INTEGER) == 1) {
+                Refactor.sendMessage(p, "Нельзя удалить Нон-РП персонажа!");
+                return;
+            }
+
             playerMenuUtility.setData("charid", item.getItemMeta().getPersistentDataContainer().get(key, PersistentDataType.INTEGER));
             MenuManager.openMenu(ConfirmCharDeletionMenu.class, p);
 
@@ -108,7 +113,7 @@ public class CharacterSelectionMenu extends Menu {
 
             ItemStack charItem = SkullCreator.itemFromBase64(character.getPropertyValue());
             ItemMeta charMeta = charItem.getItemMeta();
-            charMeta.setDisplayName(Refactor.color("&f" + String.format("[%s] %s", character.getCharRole(), character.getCharName())));
+            charMeta.setDisplayName(Refactor.color("&f" + String.format("#%d [%s] %s", character.getCharId(), character.getCharRole(), character.getCharName())));
             charMeta.setLore(lore);
             NamespacedKey key = new NamespacedKey(plugin, "charid");
             charMeta.getPersistentDataContainer().set(key, PersistentDataType.INTEGER, character.getCharId());
