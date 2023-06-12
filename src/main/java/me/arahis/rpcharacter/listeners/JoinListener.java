@@ -34,6 +34,10 @@ public class JoinListener implements Listener {
                     Refactor.sendFormattedWarn("RPPlayer %s wasn't saved successfully", player.getName());
                     e.printStackTrace();
                 }
+            } else {
+                RPPlayer rpPlayer = handler.getRPPlayer(player);
+                Character character = handler.getCharacter(player, rpPlayer.getSelectedChar());
+                Refactor.setCharacterToPlayer(player, character);
             }
 
             IProperty property = plugin.getSkinsRestorerAPI().getSkinData(player.getName());
@@ -56,8 +60,6 @@ public class JoinListener implements Listener {
                     e.printStackTrace();
                 }
             }
-
         });
-
     }
 }

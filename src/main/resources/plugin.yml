@@ -5,9 +5,33 @@ api-version: 1.19
 commands:
   createchar:
     description: Создает персонажа
-    usage: /createchar <роль> [имя]
+    usage: /createchar <role> [name]
+    permission: rpch.create
     aliases:
       - crch
   charsetskin:
     description: Изменяет скин выбранного персонажа
-    usage: /charsetskin <format[nick/url]> <id> <nick/url> <classic/slim>
+    permission: rpch.skin
+    usage: /charskin <format[nick/url]> <id> <nick/url> <classic/slim>
+    aliases:
+      - charskin
+      - chsk
+      - cs
+  charsetrole:
+    description: Изменяет роль выбранного персонажа
+    usage: /charrole <id> [role]
+    permission: rpch.role
+    aliases:
+      - charrole
+      - chro
+      - cr
+  cachechars:
+    permission: rpch.cache
+  charsmenu:
+    description: Открывает меню персонажей
+    aliases:
+      - char
+      - character
+    permission: rpch.menu
+  savedata:
+    permission: rpch.savedata

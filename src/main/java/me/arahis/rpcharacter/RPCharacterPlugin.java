@@ -1,19 +1,25 @@
 package me.arahis.rpcharacter;
 
-import me.arahis.rpcharacter.commands.CharSetSkinCommand;
-import me.arahis.rpcharacter.commands.CreateCharCommand;
+import me.arahis.rpcharacter.commands.*;
+import me.arahis.rpcharacter.commands.tabcompleters.CharSetRoleTabCompleter;
 import me.arahis.rpcharacter.commands.tabcompleters.CharSetSkinTabCompleter;
-import me.arahis.rpcharacter.database.DatabaseHandler;
+import me.arahis.rpcharacter.database.IDataHandler;
+import me.arahis.rpcharacter.database.JSONDataHandler;
+import me.arahis.rpcharacter.database.MySQLDataHandler;
 import me.arahis.rpcharacter.listeners.JoinListener;
+import me.arahis.rpcharacter.utils.Refactor;
+import me.kodysimpson.simpapi.menu.MenuManager;
 import net.skinsrestorer.api.SkinsRestorerAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.io.IOException;
 
 public final class RPCharacterPlugin extends JavaPlugin {
 
     private static RPCharacterPlugin plugin;
     private SkinsRestorerAPI skinsRestorerAPI;
-    private DatabaseHandler databaseHandler;
+    private IDataHandler dataHandler;
     @Override
     public void onEnable() {
 
@@ -22,23 +28,68 @@ public final class RPCharacterPlugin extends JavaPlugin {
         getConfig().options().copyDefaults();
         saveDefaultConfig();
 
-        databaseHandler = new DatabaseHandler();
+        switch (getConfig().getString("database-type")) {
 
-        //in case of that my plugin will start earlier than SkinRestorer
+            case "MySQL":
+
+                Refactor.sendInfo("Data storage method connected!");
+                Refactor.sendInfo("MySQL selected!");
+
+                dataHandler = new MySQLDataHandler();
+                ((MySQLDataHandler) dataHandler).initTables();
+
+
+                break;
+            case "JSON":
+
+                Refactor.sendInfo("Data storage method connected!");
+                Refactor.sendInfo("JSON selected!");
+
+                dataHandler = new JSONDataHandler();
+
+                getCommand("savedata").setExecutor(new SaveDataCommand());
+
+                try {
+
+                    ((JSONDataHandler) dataHandler).loadCharacters();
+                    ((JSONDataHandler) dataHandler).loadRPPlayers();
+
+                    Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
+                        try {
+                            ((JSONDataHandler) dataHandler).saveCharacters();
+                            ((JSONDataHandler) dataHandler).saveRPPlayers();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }, 100L, 20 * 60 * 5L);
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                break;
+
+        }
+
+        MenuManager.setup(getServer(), this);
+
+        // in case if my plugin will start earlier than SkinsRestorer
         Bukkit.getScheduler().runTaskLater(this, () -> {
             if(SkinsRestorerAPI.getApi() != null) {
                 skinsRestorerAPI = SkinsRestorerAPI.getApi();
-                System.out.println("SkinsRestorerAPI has been successfully initialized");
+                Refactor.sendInfo("SkinsRestorerAPI has been successfully initialized");
             }
-        }, 100L);
+        }, 50L);
 
         Bukkit.getPluginManager().registerEvents(new JoinListener(), this);
 
+        getCommand("charsetskin").setTabCompleter(new CharSetSkinTabCompleter());
+        getCommand("charsetrole").setTabCompleter(new CharSetRoleTabCompleter());
+
         getCommand("createchar").setExecutor(new CreateCharCommand());
         getCommand("charsetskin").setExecutor(new CharSetSkinCommand());
-        getCommand("charsetskin").setTabCompleter(new CharSetSkinTabCompleter());
+        getCommand("charsetrole").setExecutor(new CharSetRoleCommand());
+        getCommand("charsmenu").setExecutor(new CharsMenuCommand());
 
-        databaseHandler.initTables();
 
     }
 
@@ -47,8 +98,8 @@ public final class RPCharacterPlugin extends JavaPlugin {
         // Plugin shutdown logic
     }
 
-    public DatabaseHandler getDatabaseHandler() {
-        return databaseHandler;
+    public IDataHandler getDataHandler() {
+        return dataHandler;
     }
 
     public static RPCharacterPlugin getPlugin() {
