@@ -38,11 +38,6 @@ public class CreateCharCommand implements CommandExecutor {
 
         Player player = (Player) sender;
 
-        if(handler.getRPPlayer(player).getAmountOfChars() > limit) {
-            Refactor.sendMessageFromConfig(player, "limit-of-characters");
-            return true;
-        }
-
         // /createchar <роль> <имя>
 
         String role = args[0];
@@ -59,6 +54,11 @@ public class CreateCharCommand implements CommandExecutor {
         }
 
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+
+            if(handler.getRPPlayer(player).getAmountOfChars() >= limit) {
+                Refactor.sendMessageFromConfig(player, "limit-of-characters");
+                return;
+            }
 
             IProperty property = plugin.getSkinsRestorerAPI().getSkinData(player.getName());
 
