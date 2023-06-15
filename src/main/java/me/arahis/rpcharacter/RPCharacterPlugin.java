@@ -3,6 +3,7 @@ package me.arahis.rpcharacter;
 import me.arahis.rpcharacter.commands.*;
 import me.arahis.rpcharacter.commands.tabcompleters.CharSetRoleTabCompleter;
 import me.arahis.rpcharacter.commands.tabcompleters.CharSetSkinTabCompleter;
+import me.arahis.rpcharacter.commands.tabcompleters.RPCharTabCompleter;
 import me.arahis.rpcharacter.database.IDataHandler;
 import me.arahis.rpcharacter.database.JSONDataHandler;
 import me.arahis.rpcharacter.database.MySQLDataHandler;
@@ -37,7 +38,6 @@ public final class RPCharacterPlugin extends JavaPlugin {
 
                 dataHandler = new MySQLDataHandler();
                 ((MySQLDataHandler) dataHandler).initTables();
-
 
                 break;
             case "JSON":
@@ -84,11 +84,13 @@ public final class RPCharacterPlugin extends JavaPlugin {
 
         getCommand("charsetskin").setTabCompleter(new CharSetSkinTabCompleter());
         getCommand("charsetrole").setTabCompleter(new CharSetRoleTabCompleter());
+        getCommand("rpchar").setTabCompleter(new RPCharTabCompleter());
 
         getCommand("createchar").setExecutor(new CreateCharCommand());
         getCommand("charsetskin").setExecutor(new CharSetSkinCommand());
         getCommand("charsetrole").setExecutor(new CharSetRoleCommand());
         getCommand("charsmenu").setExecutor(new CharsMenuCommand());
+        getCommand("rpchar").setExecutor(new RPCharCommand());
 
 
     }
