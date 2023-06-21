@@ -7,7 +7,7 @@ Only Russian localization, and EN probably will never appear.
 
 
 <> - принимает 1 аргумент, \[] - принимает несколько аргументов.
-/char - открыть меню персонажей
-/createchar <роль> \[имя] - создать персонажа
-/charsetskin <формат> <id> <url/name> <classic/slim> - изменить скин
-/charsetrole <id> [роль] - изменить роль
+* /char - открыть меню персонажей
+* /createchar <роль> \[имя] - создать персонажа
+* /charsetskin <формат> <id> <url/name> <classic/slim> - изменить скин
+* /charsetrole <id> [роль] - изменить роль
