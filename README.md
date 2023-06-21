@@ -10,4 +10,4 @@ Only Russian localization, and EN probably will never appear.
 * /char - открыть меню персонажей
 * /createchar <роль> \[имя] - создать персонажа
 * /charsetskin <формат> <id> <url/name> <classic/slim> - изменить скин
-* /charsetrole <id> \[роль] - изменить роль
+* /charsetrole \<id> \[роль] - изменить роль
