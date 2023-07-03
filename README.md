@@ -1,5 +1,5 @@
 # RPCharacter
-Only Russian localization, and EN probably will never appear.
+Only Russian localization, and EN or any other probably will never appear.
 
 
 Плагин добавляет роле-плей персонажей в игре. Вы можете создать персонажа с собственной ролью, именем и скином. Для скинов используется SkinsRestorerAPI, поэтому SkinsRestorer должен быть установлен на сервере. 
