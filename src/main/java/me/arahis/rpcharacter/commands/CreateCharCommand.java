@@ -6,6 +6,8 @@ import me.arahis.rpcharacter.database.SavingType;
 import me.arahis.rpcharacter.models.Character;
 import me.arahis.rpcharacter.models.RPPlayer;
 import me.arahis.rpcharacter.utils.Refactor;
+import net.skinsrestorer.api.SkinVariant;
+import net.skinsrestorer.api.exception.SkinRequestException;
 import net.skinsrestorer.api.property.IProperty;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -60,7 +62,18 @@ public class CreateCharCommand implements CommandExecutor {
                 return;
             }
 
-            IProperty property = plugin.getSkinsRestorerAPI().getSkinData(player.getName());
+            IProperty property = plugin.getSkinsRestorerAPI().getSkinData(plugin.getSkinsRestorerAPI().getSkinName(player.getName()));
+
+            if(property == null) {
+                try {
+                    property = plugin.getSkinsRestorerAPI().genSkinUrl("https://ic.wampi.ru/2023/06/17/Original_Steve_with_Beard.png", SkinVariant.CLASSIC);
+                } catch (SkinRequestException e) {
+                    Refactor.sendMessage(player, "Ошибка SkinsRestorerAPI! Попробуйте снова позже!");
+                    Refactor.sendMessage(player, "Если ошибка осталась, создайте тикет в поддержке!");
+                    e.printStackTrace();
+                    return;
+                }
+            }
 
             RPPlayer rpPlayer = handler.getRPPlayer(player);
             rpPlayer.setAmountOfChars(rpPlayer.getAmountOfChars() + 1);
