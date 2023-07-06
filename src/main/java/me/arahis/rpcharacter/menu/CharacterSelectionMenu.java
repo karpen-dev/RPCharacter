@@ -5,6 +5,7 @@ import me.arahis.rpcharacter.database.IDataHandler;
 import me.arahis.rpcharacter.database.SavingType;
 import me.arahis.rpcharacter.models.Character;
 import me.arahis.rpcharacter.models.RPPlayer;
+import me.arahis.rpcharacter.utils.CharCreationUtils;
 import me.arahis.rpcharacter.utils.Refactor;
 import me.kodysimpson.simpapi.exceptions.MenuManagerException;
 import me.kodysimpson.simpapi.exceptions.MenuManagerNotSetupException;
@@ -15,6 +16,7 @@ import me.kodysimpson.simpapi.menu.PlayerMenuUtility;
 import net.skinsrestorer.api.PlayerWrapper;
 import net.skinsrestorer.api.property.IProperty;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -32,7 +34,6 @@ public class CharacterSelectionMenu extends Menu {
 
     RPCharacterPlugin plugin = RPCharacterPlugin.getPlugin();
     IDataHandler handler = plugin.getDataHandler();
-    List<String> lore = new ArrayList<>();
 
     @Override
     public String getMenuName() {
@@ -41,13 +42,16 @@ public class CharacterSelectionMenu extends Menu {
 
     @Override
     public int getSlots() {
-        return 18;
+        return 27;
     }
 
     @Override
     public boolean cancelAllClicks() {
         return true;
     }
+
+    RPCharacterPlugin pl = RPCharacterPlugin.getPlugin();
+    CharCreationUtils charCreationUtils = pl.getCharCreationUtils();
 
     @Override
     public void handleMenu(InventoryClickEvent e) throws MenuManagerNotSetupException, MenuManagerException {
@@ -60,8 +64,35 @@ public class CharacterSelectionMenu extends Menu {
 
         if(e.isLeftClick()) {
 
+            if (item.getType().equals(Material.WRITABLE_BOOK)) {
+                Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                    charCreationUtils.addChar(p, new Character((long) handler.getLastCharId() + 1,
+                            p.getName(),
+                            p.getUniqueId().toString(),
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            handler.getLastCharIdByPlayer(p) + 1)
+                    );
+                    Bukkit.getScheduler().runTask(plugin, () -> {
+                        try {
+                            MenuManager.openMenu(CharacterCreationMenu.class, p);
+                        } catch (MenuManagerException | MenuManagerNotSetupException ex) {
+                            Refactor.sendMessage(p, "menu-exception");
+                            ex.printStackTrace();
+                        }
+                    });
+                });
+                return;
+            }
+
             Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
                 RPPlayer rpPlayer = handler.getRPPlayer(p);
+
+                if(rpPlayer.getSelectedChar() == item.getItemMeta().getPersistentDataContainer().get(key, PersistentDataType.INTEGER)) return;
+
                 rpPlayer.setSelectedChar(item.getItemMeta().getPersistentDataContainer().get(key, PersistentDataType.INTEGER));
 
                 try {
@@ -90,13 +121,9 @@ public class CharacterSelectionMenu extends Menu {
 
         if(e.isRightClick() && e.isShiftClick()) {
 
-            if(item.getItemMeta().getPersistentDataContainer().get(key, PersistentDataType.INTEGER) == 1) {
-                Refactor.sendMessage(p, "Нельзя удалить Нон-РП персонажа!");
-                return;
-            }
-
-            playerMenuUtility.setData("charid", item.getItemMeta().getPersistentDataContainer().get(key, PersistentDataType.INTEGER));
-            MenuManager.openMenu(ConfirmCharDeletionMenu.class, p);
+            int id = item.getItemMeta().getPersistentDataContainer().get(key, PersistentDataType.INTEGER);
+            playerMenuUtility.setData("charid", id);
+            MenuManager.openMenu(EditOptionSelectionMenu.class, p);
 
         }
 
@@ -105,23 +132,45 @@ public class CharacterSelectionMenu extends Menu {
     @Override
     public void setMenuItems() {
 
-        lore.add("");
-        lore.add(Refactor.color("&e&lЛКМ &r&e→ Выбрать персонажа"));
-        lore.add(Refactor.color("&e&lShift + ПКМ &r&e→ Удалить персонажа"));
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            RPPlayer rpPlayer = handler.getRPPlayer(p);
+            Bukkit.getScheduler().runTask(plugin, () -> {
 
-        for(Character character : handler.getPlayerCharacters(p)) {
+                inventory.setItem(22, makeItem
+                        (
+                                Material.WRITABLE_BOOK,
+                                Refactor.color("&fСоздать персонажа"),
+                                Refactor.color("&eНажмите, чтобы перейти в меню создания персонажа")
+                        )
+                );
 
-            ItemStack charItem = SkullCreator.itemFromBase64(character.getPropertyValue());
-            ItemMeta charMeta = charItem.getItemMeta();
-            charMeta.setDisplayName(Refactor.color("&f" + String.format("#%d [%s] %s", character.getCharId(), character.getCharRole(), character.getCharName())));
-            charMeta.setLore(lore);
-            NamespacedKey key = new NamespacedKey(plugin, "charid");
-            charMeta.getPersistentDataContainer().set(key, PersistentDataType.INTEGER, character.getCharId());
-            charItem.setItemMeta(charMeta);
+                for(Character character : handler.getPlayerCharacters(p)) {
 
-            inventory.addItem(charItem);
+                    List<String> lore = new ArrayList<>();
 
-        }
+                    if(character.getCharId() == rpPlayer.getSelectedChar()) {
+                        lore.add("");
+                        lore.add(Refactor.color("&a[ВЫБРАН]"));
+                        lore.add(Refactor.color("&eShift + ПКМ → Редактировать персонажа"));
+                    } else {
+                        lore.add("");
+                        lore.add(Refactor.color("&eЛКМ → Выбрать персонажа"));
+                        lore.add(Refactor.color("&eShift + ПКМ → Редактировать персонажа"));
+                    }
+
+                    ItemStack charItem = SkullCreator.itemFromBase64(character.getPropertyValue());
+                    ItemMeta charMeta = charItem.getItemMeta();
+                    charMeta.setDisplayName(Refactor.color("&f" + String.format("#%d [%s] %s", character.getCharId(), character.getCharRole(), character.getCharName())));
+                    charMeta.setLore(lore);
+                    NamespacedKey key = new NamespacedKey(plugin, "charid");
+                    charMeta.getPersistentDataContainer().set(key, PersistentDataType.INTEGER, character.getCharId());
+                    charItem.setItemMeta(charMeta);
+
+                    inventory.addItem(charItem);
+
+                }
+            });
+        });
 
     }
 
