@@ -11,6 +11,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -24,19 +26,19 @@ public class Refactor {
     }
 
     public static void sendMessage(Player player, String message) {
-        player.sendMessage(color(prefix) + message);
+        player.sendMessage(color(prefix + message));
     }
 
     public static void sendMessage(CommandSender sender, String message) {
-        sender.sendMessage(color(prefix) + message);
+        sender.sendMessage(color(prefix + message));
     }
 
     public static void sendMessageFromConfig(Player player, String path) {
-        player.sendMessage(color(prefix) + RPCharacterPlugin.getPlugin().getConfig().getString(path));
+        player.sendMessage(color(prefix + RPCharacterPlugin.getPlugin().getConfig().getString(path)));
     }
 
     public static void sendMessageFromConfig(CommandSender sender, String path) {
-        sender.sendMessage(color(prefix) + RPCharacterPlugin.getPlugin().getConfig().getString(path));
+        sender.sendMessage(color(prefix + RPCharacterPlugin.getPlugin().getConfig().getString(path)));
     }
 
     public static void sendInfo(String message) {
@@ -77,6 +79,15 @@ public class Refactor {
             return false;
         } catch (NumberFormatException e) {
             return true;
+        }
+    }
+
+    public static boolean isURL(String toCheck) {
+        try {
+            URL url = new URL(toCheck);
+            return true;
+        } catch (MalformedURLException ignored) {
+            return false;
         }
     }
 

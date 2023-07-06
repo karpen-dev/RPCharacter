@@ -8,6 +8,7 @@ import me.arahis.rpcharacter.database.IDataHandler;
 import me.arahis.rpcharacter.database.JSONDataHandler;
 import me.arahis.rpcharacter.database.MySQLDataHandler;
 import me.arahis.rpcharacter.listeners.JoinListener;
+import me.arahis.rpcharacter.utils.CharCreationUtils;
 import me.arahis.rpcharacter.utils.Refactor;
 import me.kodysimpson.simpapi.menu.MenuManager;
 import net.skinsrestorer.api.SkinsRestorerAPI;
@@ -21,10 +22,13 @@ public final class RPCharacterPlugin extends JavaPlugin {
     private static RPCharacterPlugin plugin;
     private SkinsRestorerAPI skinsRestorerAPI;
     private IDataHandler dataHandler;
+    private CharCreationUtils charCreationUtils;
+
     @Override
     public void onEnable() {
 
         plugin = this;
+        charCreationUtils = new CharCreationUtils();
 
         getConfig().options().copyDefaults();
         saveDefaultConfig();
@@ -100,6 +104,9 @@ public final class RPCharacterPlugin extends JavaPlugin {
         // Plugin shutdown logic
     }
 
+    public CharCreationUtils getCharCreationUtils() {
+        return charCreationUtils;
+    }
     public IDataHandler getDataHandler() {
         return dataHandler;
     }
