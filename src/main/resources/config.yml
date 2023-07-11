@@ -9,7 +9,7 @@ mysql:
   username: ""
   password: ""
 
-prefix: "&b[Etta] &r"
+prefix: "&6[RP-Char] &r"
 
 debug: true
 
