@@ -51,6 +51,11 @@ public class ConfirmCharDeletionMenu extends Menu {
 
                 int id = playerMenuUtility.getData("charid", Integer.class);
 
+                if(id == 1) {
+                    Refactor.sendMessage(p, "Нельзя удалять Нон-РП персонажа");
+                    return;
+                }
+
                 Character character = handler.getCharacter(p, id);
                 String charName = character.getCharName();
                 String charRole = character.getCharRole();

@@ -72,6 +72,11 @@ public class EditOptionSelectionMenu extends Menu {
 
             int id = (int) playerMenuUtility.getData("charid");
 
+            if(id == 1) {
+                Refactor.sendMessage(p, "Нельзя редактировать роль Нон-РП персонажа");
+                return;
+            }
+
             builder.onFinish((p, value) -> {
 
                 Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
