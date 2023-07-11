@@ -8,6 +8,7 @@ import me.arahis.rpcharacter.database.IDataHandler;
 import me.arahis.rpcharacter.database.JSONDataHandler;
 import me.arahis.rpcharacter.database.MySQLDataHandler;
 import me.arahis.rpcharacter.listeners.JoinListener;
+import me.arahis.rpcharacter.placeholders.RPCharacterExpansion;
 import me.arahis.rpcharacter.utils.CharCreationUtils;
 import me.arahis.rpcharacter.utils.Refactor;
 import me.kodysimpson.simpapi.menu.MenuManager;
@@ -85,6 +86,12 @@ public final class RPCharacterPlugin extends JavaPlugin {
         }, 50L);
 
         Bukkit.getPluginManager().registerEvents(new JoinListener(), this);
+
+        Bukkit.getScheduler().runTaskLater(this, () -> {
+            if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+                new RPCharacterExpansion().register();
+            }
+        }, 50L);
 
         getCommand("charsetskin").setTabCompleter(new CharSetSkinTabCompleter());
         getCommand("charsetrole").setTabCompleter(new CharSetRoleTabCompleter());
