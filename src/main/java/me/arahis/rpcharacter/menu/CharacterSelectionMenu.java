@@ -85,41 +85,39 @@ public class CharacterSelectionMenu extends Menu {
                         }
                     });
                 });
-                return;
+
+            } else if (item.getType().equals(Material.PLAYER_HEAD)) {
+                Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                    RPPlayer rpPlayer = handler.getRPPlayer(p);
+
+                    if(rpPlayer.getSelectedChar() == item.getItemMeta().getPersistentDataContainer().get(key, PersistentDataType.INTEGER)) return;
+
+                    rpPlayer.setSelectedChar(item.getItemMeta().getPersistentDataContainer().get(key, PersistentDataType.INTEGER));
+
+                    try {
+                        handler.saveRPPlayer(rpPlayer, SavingType.UPDATE);
+                    } catch (SQLException ex) {
+                        Refactor.sendFormattedWarn("RPPlayer %s wasn't saved successfully", rpPlayer.getName());
+                        Refactor.sendMessageFromConfig(p, "db-con-error");
+                        ex.printStackTrace();
+                        return;
+                    }
+
+                    Character character = handler.getCharacter(p, item.getItemMeta().getPersistentDataContainer().get(key, PersistentDataType.INTEGER));
+
+                    IProperty property = plugin.getSkinsRestorerAPI().createPlatformProperty(character.getPropertyName(), character.getPropertyValue(), character.getPropertySignature());
+
+                    plugin.getSkinsRestorerAPI().applySkin(new PlayerWrapper(p), property);
+
+                    Refactor.setDisplayName(p, character);
+                    // Персонаж #%d [%s] %s был выбран
+                    Refactor.sendMessage(p, String.format(plugin.getConfig().getString("char-selected"), character.getCharId(), character.getCharRole(), character.getCharName()));
+
+                });
+                p.closeInventory();
             }
 
-            Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-                RPPlayer rpPlayer = handler.getRPPlayer(p);
-
-                if(rpPlayer.getSelectedChar() == item.getItemMeta().getPersistentDataContainer().get(key, PersistentDataType.INTEGER)) return;
-
-                rpPlayer.setSelectedChar(item.getItemMeta().getPersistentDataContainer().get(key, PersistentDataType.INTEGER));
-
-                try {
-                    handler.saveRPPlayer(rpPlayer, SavingType.UPDATE);
-                } catch (SQLException ex) {
-                    Refactor.sendFormattedWarn("RPPlayer %s wasn't saved successfully", rpPlayer.getName());
-                    Refactor.sendMessageFromConfig(p, "db-con-error");
-                    ex.printStackTrace();
-                    return;
-                }
-
-                Character character = handler.getCharacter(p, item.getItemMeta().getPersistentDataContainer().get(key, PersistentDataType.INTEGER));
-
-                IProperty property = plugin.getSkinsRestorerAPI().createPlatformProperty(character.getPropertyName(), character.getPropertyValue(), character.getPropertySignature());
-
-                plugin.getSkinsRestorerAPI().applySkin(new PlayerWrapper(p), property);
-
-                Refactor.setDisplayName(p, character);
-                // Персонаж #%d [%s] %s был выбран
-                Refactor.sendMessage(p, String.format(plugin.getConfig().getString("char-selected"), character.getCharId(), character.getCharRole(), character.getCharName()));
-
-            });
-
-            return;
-        }
-
-        if(e.isRightClick() && e.isShiftClick()) {
+        } else if(e.isRightClick() && e.isShiftClick()) {
 
             int id = item.getItemMeta().getPersistentDataContainer().get(key, PersistentDataType.INTEGER);
             playerMenuUtility.setData("charid", id);
