@@ -62,7 +62,7 @@ public class CreateCharCommand implements CommandExecutor {
                 return;
             }
 
-            IProperty property = plugin.getSkinsRestorerAPI().getSkinData(plugin.getSkinsRestorerAPI().getSkinName(player.getName()));
+            IProperty property = plugin.getSkinsRestorerAPI().getSkinData(player.getName());
 
             if(property == null) {
                 try {
