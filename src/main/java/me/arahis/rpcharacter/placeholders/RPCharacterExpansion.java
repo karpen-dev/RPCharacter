@@ -2,6 +2,7 @@ package me.arahis.rpcharacter.placeholders;
 
 import me.arahis.rpcharacter.RPCharacterPlugin;
 import me.arahis.rpcharacter.database.IDataHandler;
+import me.arahis.rpcharacter.models.Character;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -36,6 +37,7 @@ public class RPCharacterExpansion extends PlaceholderExpansion {
         String name = "";
 
         CompletableFuture<Integer> selectedCharId = CompletableFuture.supplyAsync(() -> dataHandler.getRPPlayer(player).getSelectedChar());
+
         int id = 0;
         try {
             id = selectedCharId.get();
@@ -47,13 +49,45 @@ public class RPCharacterExpansion extends PlaceholderExpansion {
             }
             e.printStackTrace();
         }
-        if(params.equals("fullname")) {
+
+        int finalId = id;
+        CompletableFuture<String> selectedCharName = CompletableFuture.supplyAsync(
+                () -> {
+                    Character character = dataHandler.getCharacter(player, finalId);
+                    return "[" + character.getCharRole() + "]" + " " + character.getCharName();
+                }
+        );
+
+        String finalName = "";
+        
+        try {
+            finalName = selectedCharName.get();
+        } catch (InterruptedException | ExecutionException e) {
+            for(Player op : Bukkit.getOnlinePlayers()) {
+                if(op.isOp()) {
+                    op.sendMessage("Ошибка получения плейсхолдера, чекни консоль");
+                }
+            }
+            e.printStackTrace();
+        }
+
+        if(params.equals("name")) {
             if(id == 1) {
                 return "Нон-РП персонаж";
             } else if (id < 1) {
                 return "Ошибка!";
             } else {
                 return player.getDisplayName();
+            }
+        }
+
+        if(params.equals("fullname")) {
+            if(id == 1) {
+                return "Нон-РП персонаж";
+            } else if(id < 1) {
+                return "Ошибка!";
+            } else {
+                return finalName;
             }
         }
         return null;
