@@ -51,43 +51,39 @@ public class RPCharacterExpansion extends PlaceholderExpansion {
         }
 
         int finalId = id;
-        CompletableFuture<String> selectedCharName = CompletableFuture.supplyAsync(
-                () -> {
-                    Character character = dataHandler.getCharacter(player, finalId);
-                    return "[" + character.getCharRole() + "]" + " " + character.getCharName();
-                }
+        CompletableFuture<Character> selectedChar = CompletableFuture.supplyAsync(
+                () -> dataHandler.getCharacter(player, finalId)
         );
 
-        String finalName = "";
-        
+        Character character = null;
         try {
-            finalName = selectedCharName.get();
+            character = selectedChar.get();
         } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
             for(Player op : Bukkit.getOnlinePlayers()) {
                 if(op.isOp()) {
                     op.sendMessage("Ошибка получения плейсхолдера, чекни консоль");
                 }
             }
-            e.printStackTrace();
         }
 
         if(params.equals("name")) {
             if(id == 1) {
-                return "Нон-РП персонаж";
-            } else if (id < 1) {
-                return "Ошибка!";
+                return player.getName();
+            } else if (character == null) {
+                return player.getName();
             } else {
-                return player.getDisplayName();
+                return character.getCharName();
             }
         }
 
         if(params.equals("fullname")) {
             if(id == 1) {
                 return "Нон-РП персонаж";
-            } else if(id < 1) {
-                return "Ошибка!";
+            } else if(character == null) {
+                return player.getName();
             } else {
-                return finalName;
+                return "[" + character.getCharRole() + "]" + " " + character.getCharName();
             }
         }
         return null;
