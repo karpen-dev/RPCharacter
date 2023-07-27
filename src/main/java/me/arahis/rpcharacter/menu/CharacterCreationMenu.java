@@ -3,6 +3,7 @@ package me.arahis.rpcharacter.menu;
 import me.arahis.rpcharacter.RPCharacterPlugin;
 import me.arahis.rpcharacter.database.SavingType;
 import me.arahis.rpcharacter.models.Character;
+import me.arahis.rpcharacter.models.RPPlayer;
 import me.arahis.rpcharacter.utils.CharCreationUtils;
 import me.arahis.rpcharacter.utils.Refactor;
 import me.kodysimpson.simpapi.exceptions.MenuManagerException;
@@ -16,6 +17,7 @@ import net.skinsrestorer.api.exception.SkinRequestException;
 import net.skinsrestorer.api.property.IProperty;
 import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -94,7 +96,7 @@ public class CharacterCreationMenu extends Menu {
                     return Arrays.asList(
                             AnvilGUI.ResponseAction.close(),
                             AnvilGUI.ResponseAction.run(() -> {
-                                charCreationUtils.getChar(p).setCharName(stateSnapshot.getText());
+                                charCreationUtils.getChar(p).setCharName(ChatColor.stripColor(stateSnapshot.getText()));
                                 try {
                                     MenuManager.openMenu(CharacterCreationMenu.class, stateSnapshot.getPlayer());
                                 } catch (MenuManagerException | MenuManagerNotSetupException ex) {
@@ -109,7 +111,6 @@ public class CharacterCreationMenu extends Menu {
                 .title("Установка имени")
                 .plugin(RPCharacterPlugin.getPlugin())
                 .open(p);
-                System.out.println(charCreationUtils.getChar(p).getCharName());
                 break;
             case BOOK:
                 new AnvilGUI.Builder()
@@ -126,7 +127,7 @@ public class CharacterCreationMenu extends Menu {
                             return Arrays.asList(
                                     AnvilGUI.ResponseAction.close(),
                                     AnvilGUI.ResponseAction.run(() -> {
-                                        charCreationUtils.getChar(p).setCharRole(stateSnapshot.getText());
+                                        charCreationUtils.getChar(p).setCharRole(ChatColor.stripColor(stateSnapshot.getText()));
                                         try {
                                             MenuManager.openMenu(CharacterCreationMenu.class, stateSnapshot.getPlayer());
                                         } catch (MenuManagerException | MenuManagerNotSetupException ex) {
@@ -242,7 +243,10 @@ public class CharacterCreationMenu extends Menu {
                         return;
                     }
                     try {
+                        RPPlayer rpPlayer = plugin.getDataHandler().getRPPlayer(p);
+                        rpPlayer.setAmountOfChars(rpPlayer.getAmountOfChars() + 1);
                         plugin.getDataHandler().saveCharacter(character, SavingType.SAVE);
+                        plugin.getDataHandler().saveRPPlayer(rpPlayer, SavingType.UPDATE);
                         Refactor.sendMessage(p, String.format(plugin.getConfig().getString("char-created"), character.getCharId(), character.getCharRole(), character.getCharName()));
                     } catch (SQLException ex) {
                         ex.printStackTrace();
