@@ -12,6 +12,7 @@ import net.skinsrestorer.api.property.IProperty;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
@@ -19,7 +20,7 @@ import java.sql.SQLException;
 
 public class JoinListener implements Listener {
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onJoin(PlayerJoinEvent event) {
 
         Player player = event.getPlayer();
