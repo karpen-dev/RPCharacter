@@ -18,6 +18,7 @@ import net.skinsrestorer.api.property.IProperty;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -112,6 +113,14 @@ public class CharacterSelectionMenu extends Menu {
                     Refactor.setDisplayName(p, character);
                     // Персонаж #%d [%s] %s был выбран
                     Refactor.sendMessage(p, String.format(plugin.getConfig().getString("char-selected"), character.getCharId(), character.getCharRole(), character.getCharName()));
+                    for(Player target : Bukkit.getOnlinePlayers()) {
+                        if(target.equals(p)) continue;
+                        if(target.getWorld().equals(p.getWorld())) {
+                            if(target.getLocation().distanceSquared(p.getLocation()) <= Math.pow(128, 2)) {
+                                Refactor.sendMessage(target, String.format("%s выбрал персонажа #%d [%s] %s", p.getName(), character.getCharId(), character.getCharRole(), character.getCharName()));
+                            }
+                        }
+                    }
 
                 });
                 p.closeInventory();
