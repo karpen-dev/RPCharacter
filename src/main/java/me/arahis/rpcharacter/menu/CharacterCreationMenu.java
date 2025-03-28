@@ -96,7 +96,7 @@ public class CharacterCreationMenu extends Menu {
                     return Arrays.asList(
                             AnvilGUI.ResponseAction.close(),
                             AnvilGUI.ResponseAction.run(() -> {
-                                charCreationUtils.getChar(p).setCharName(ChatColor.stripColor(stateSnapshot.getText()));
+                                charCreationUtils.getChar(player).setCharName(ChatColor.stripColor(stateSnapshot.getText()));
                                 try {
                                     MenuManager.openMenu(CharacterCreationMenu.class, stateSnapshot.getPlayer());
                                 } catch (MenuManagerException | MenuManagerNotSetupException ex) {
@@ -110,7 +110,7 @@ public class CharacterCreationMenu extends Menu {
                 .itemLeft(new ItemStack(Material.NAME_TAG))
                 .title("Установка имени")
                 .plugin(RPCharacterPlugin.getPlugin())
-                .open(p);
+                .open(player);
                 break;
             case BOOK:
                 new AnvilGUI.Builder()
@@ -127,7 +127,7 @@ public class CharacterCreationMenu extends Menu {
                             return Arrays.asList(
                                     AnvilGUI.ResponseAction.close(),
                                     AnvilGUI.ResponseAction.run(() -> {
-                                        charCreationUtils.getChar(p).setCharRole(ChatColor.stripColor(stateSnapshot.getText()));
+                                        charCreationUtils.getChar(player).setCharRole(ChatColor.stripColor(stateSnapshot.getText()));
                                         try {
                                             MenuManager.openMenu(CharacterCreationMenu.class, stateSnapshot.getPlayer());
                                         } catch (MenuManagerException | MenuManagerNotSetupException ex) {
@@ -141,11 +141,11 @@ public class CharacterCreationMenu extends Menu {
                         .text("Впишите сюда роль")
                         .itemLeft(new ItemStack(Material.BOOK))
                         .plugin(RPCharacterPlugin.getPlugin())
-                        .open(p);
-                System.out.println(charCreationUtils.getChar(p).getCharRole());
+                        .open(player);
+                System.out.println(charCreationUtils.getChar(player).getCharRole());
                 break;
             case PLAYER_HEAD:
-                PlayerChatInput.PlayerChatInputBuilder<String> builder = new PlayerChatInput.PlayerChatInputBuilder<>(plugin, p);
+                PlayerChatInput.PlayerChatInputBuilder<String> builder = new PlayerChatInput.PlayerChatInputBuilder<>(plugin, player);
 
                 builder.isValidInput((p, str) -> {
                     try {
@@ -218,36 +218,36 @@ public class CharacterCreationMenu extends Menu {
                 });
 
                 builder.build().start();
-                p.closeInventory();
-                Refactor.sendMessage(p, "&c\"Отмена\"&r, если хотите отменить действие");
+                player.closeInventory();
+                Refactor.sendMessage(player, "&c\"Отмена\"&r, если хотите отменить действие");
 
                 break;
             case ARROW:
-                Character character = charCreationUtils.getChar(p);
+                Character character = charCreationUtils.getChar(player);
                 if(character.getCharRole() == null || character.getCharRole().length() <= 1) {
-                    Refactor.sendMessage(p, "Установите роль");
+                    Refactor.sendMessage(player, "Установите роль");
                     return;
                 }
                 if(character.getCharName() == null || character.getCharName().length() <= 1) {
-                    Refactor.sendMessage(p, "Установите ник");
+                    Refactor.sendMessage(player, "Установите ник");
                     return;
                 }
                 if(character.getPropertyName() == null || character.getPropertyValue() == null || character.getPropertySignature() == null) {
-                    Refactor.sendMessage(p, "Установите скин");
+                    Refactor.sendMessage(player, "Установите скин");
                     return;
                 }
-                p.closeInventory();
+                player.closeInventory();
                 Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-                    if(plugin.getDataHandler().getRPPlayer(p).getAmountOfChars() >= plugin.getConfig().getInt("limit")) {
-                        Refactor.sendMessageFromConfig(p, "limit-of-characters");
+                    if(plugin.getDataHandler().getRPPlayer(player).getAmountOfChars() >= plugin.getConfig().getInt("limit")) {
+                        Refactor.sendMessageFromConfig(player, "limit-of-characters");
                         return;
                     }
                     try {
-                        RPPlayer rpPlayer = plugin.getDataHandler().getRPPlayer(p);
+                        RPPlayer rpPlayer = plugin.getDataHandler().getRPPlayer(player);
                         rpPlayer.setAmountOfChars(rpPlayer.getAmountOfChars() + 1);
                         plugin.getDataHandler().saveCharacter(character, SavingType.SAVE);
                         plugin.getDataHandler().saveRPPlayer(rpPlayer, SavingType.UPDATE);
-                        Refactor.sendMessage(p, String.format(plugin.getConfig().getString("char-created"), character.getCharId(), character.getCharRole(), character.getCharName()));
+                        Refactor.sendMessage(player, String.format(plugin.getConfig().getString("char-created"), character.getCharId(), character.getCharRole(), character.getCharName()));
                     } catch (SQLException ex) {
                         ex.printStackTrace();
                     }

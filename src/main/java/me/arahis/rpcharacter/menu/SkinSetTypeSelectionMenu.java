@@ -43,7 +43,7 @@ public class SkinSetTypeSelectionMenu extends Menu {
             playerMenuUtility.setData("skinsettype", "name");
         }
 
-        MenuManager.openMenu(SkinTypeSelectionMenu.class, p);
+        MenuManager.openMenu(SkinTypeSelectionMenu.class, player);
 
     }
 

@@ -67,21 +67,21 @@ public class CharacterSelectionMenu extends Menu {
 
             if (item.getType().equals(Material.WRITABLE_BOOK)) {
                 Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-                    charCreationUtils.addChar(p, new Character((long) handler.getLastCharId() + 1,
-                            p.getName(),
-                            p.getUniqueId().toString(),
+                    charCreationUtils.addChar(player, new Character((long) handler.getLastCharId() + 1,
+                            player.getName(),
+                            player.getUniqueId().toString(),
                             null,
                             null,
                             null,
                             null,
                             null,
-                            handler.getLastCharIdByPlayer(p) + 1)
+                            handler.getLastCharIdByPlayer(player) + 1)
                     );
                     Bukkit.getScheduler().runTask(plugin, () -> {
                         try {
-                            MenuManager.openMenu(CharacterCreationMenu.class, p);
+                            MenuManager.openMenu(CharacterCreationMenu.class, player);
                         } catch (MenuManagerException | MenuManagerNotSetupException ex) {
-                            Refactor.sendMessage(p, "menu-exception");
+                            Refactor.sendMessage(player, "menu-exception");
                             ex.printStackTrace();
                         }
                     });
@@ -89,7 +89,7 @@ public class CharacterSelectionMenu extends Menu {
 
             } else if (item.getType().equals(Material.PLAYER_HEAD)) {
                 Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-                    RPPlayer rpPlayer = handler.getRPPlayer(p);
+                    RPPlayer rpPlayer = handler.getRPPlayer(player);
 
                     if(rpPlayer.getSelectedChar() == item.getItemMeta().getPersistentDataContainer().get(key, PersistentDataType.INTEGER)) return;
 
@@ -99,38 +99,38 @@ public class CharacterSelectionMenu extends Menu {
                         handler.saveRPPlayer(rpPlayer, SavingType.UPDATE);
                     } catch (SQLException ex) {
                         Refactor.sendFormattedWarn("RPPlayer %s wasn't saved successfully", rpPlayer.getName());
-                        Refactor.sendMessageFromConfig(p, "db-con-error");
+                        Refactor.sendMessageFromConfig(player, "db-con-error");
                         ex.printStackTrace();
                         return;
                     }
 
-                    Character character = handler.getCharacter(p, item.getItemMeta().getPersistentDataContainer().get(key, PersistentDataType.INTEGER));
+                    Character character = handler.getCharacter(player, item.getItemMeta().getPersistentDataContainer().get(key, PersistentDataType.INTEGER));
 
                     IProperty property = plugin.getSkinsRestorerAPI().createPlatformProperty(character.getPropertyName(), character.getPropertyValue(), character.getPropertySignature());
 
-                    plugin.getSkinsRestorerAPI().applySkin(new PlayerWrapper(p), property);
+                    plugin.getSkinsRestorerAPI().applySkin(new PlayerWrapper(player), property);
 
-                    Refactor.setDisplayName(p, character);
+                    Refactor.setDisplayName(player, character);
                     // Персонаж #%d [%s] %s был выбран
-                    Refactor.sendMessage(p, String.format(plugin.getConfig().getString("char-selected"), character.getCharId(), character.getCharRole(), character.getCharName()));
+                    Refactor.sendMessage(player, String.format(plugin.getConfig().getString("char-selected"), character.getCharId(), character.getCharRole(), character.getCharName()));
                     for(Player target : Bukkit.getOnlinePlayers()) {
-                        if(target.equals(p)) continue;
-                        if(target.getWorld().equals(p.getWorld())) {
-                            if(target.getLocation().distanceSquared(p.getLocation()) <= Math.pow(128, 2)) {
-                                Refactor.sendMessage(target, String.format("%s выбрал персонажа #%d [%s] %s", p.getName(), character.getCharId(), character.getCharRole(), character.getCharName()));
+                        if(target.equals(player)) continue;
+                        if(target.getWorld().equals(player.getWorld())) {
+                            if(target.getLocation().distanceSquared(player.getLocation()) <= Math.pow(128, 2)) {
+                                Refactor.sendMessage(target, String.format("%s выбрал персонажа #%d [%s] %s", player.getName(), character.getCharId(), character.getCharRole(), character.getCharName()));
                             }
                         }
                     }
 
                 });
-                p.closeInventory();
+                player.closeInventory();
             }
 
         } else if(e.isRightClick() && e.isShiftClick()) {
 
             int id = item.getItemMeta().getPersistentDataContainer().get(key, PersistentDataType.INTEGER);
             playerMenuUtility.setData("charid", id);
-            MenuManager.openMenu(EditOptionSelectionMenu.class, p);
+            MenuManager.openMenu(EditOptionSelectionMenu.class, player);
 
         }
 
@@ -140,7 +140,7 @@ public class CharacterSelectionMenu extends Menu {
     public void setMenuItems() {
 
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            RPPlayer rpPlayer = handler.getRPPlayer(p);
+            RPPlayer rpPlayer = handler.getRPPlayer(player);
             Bukkit.getScheduler().runTask(plugin, () -> {
 
                 inventory.setItem(22, makeItem
@@ -151,7 +151,7 @@ public class CharacterSelectionMenu extends Menu {
                         )
                 );
 
-                for(Character character : handler.getPlayerCharacters(p)) {
+                for(Character character : handler.getPlayerCharacters(player)) {
 
                     List<String> lore = new ArrayList<>();
 

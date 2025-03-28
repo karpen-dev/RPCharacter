@@ -51,7 +51,7 @@ public class EditOptionSelectionMenu extends Menu {
         if(e.getCurrentItem() == null) return;
 
         if(ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName()).equals("Скин")) {
-            MenuManager.openMenu(SkinSetTypeSelectionMenu.class, p);
+            MenuManager.openMenu(SkinSetTypeSelectionMenu.class, player);
         }
 
         RPCharacterPlugin plugin = RPCharacterPlugin.getPlugin();
@@ -59,7 +59,7 @@ public class EditOptionSelectionMenu extends Menu {
 
         if(ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName()).equals("Роль")) {
 
-            PlayerChatInput.PlayerChatInputBuilder<String> builder = new PlayerChatInput.PlayerChatInputBuilder<>(plugin, p);
+            PlayerChatInput.PlayerChatInputBuilder<String> builder = new PlayerChatInput.PlayerChatInputBuilder<>(plugin, player);
             builder.isValidInput((p, str) -> str.length() < 32);
 
             builder.setValue((p, str) -> str);
@@ -73,7 +73,7 @@ public class EditOptionSelectionMenu extends Menu {
             int id = (int) playerMenuUtility.getData("charid");
 
             if(id == 1) {
-                Refactor.sendMessage(p, "Нельзя редактировать роль Нон-РП персонажа");
+                Refactor.sendMessage(player, "Нельзя редактировать роль Нон-РП персонажа");
                 return;
             }
 
@@ -119,15 +119,15 @@ public class EditOptionSelectionMenu extends Menu {
 
             PlayerChatInput<String> in = builder.build();
 
-            p.closeInventory();
+            player.closeInventory();
             in.start();
-            Refactor.sendMessage(p, "&c\"Отмена\"&r, если хотите отменить действие");
+            Refactor.sendMessage(player, "&c\"Отмена\"&r, если хотите отменить действие");
 
             return;
         }
 
         if(ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName()).equals("Удалить")) {
-            MenuManager.openMenu(ConfirmCharDeletionMenu.class, p);
+            MenuManager.openMenu(ConfirmCharDeletionMenu.class, player);
         }
 
     }

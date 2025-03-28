@@ -52,17 +52,17 @@ public class ConfirmCharDeletionMenu extends Menu {
                 int id = playerMenuUtility.getData("charid", Integer.class);
 
                 if(id == 1) {
-                    Refactor.sendMessage(p, "Нельзя удалять Нон-РП персонажа");
+                    Refactor.sendMessage(player, "Нельзя удалять Нон-РП персонажа");
                     return;
                 }
 
-                Character character = handler.getCharacter(p, id);
+                Character character = handler.getCharacter(player, id);
                 String charName = character.getCharName();
                 String charRole = character.getCharRole();
-                RPPlayer rpPlayer = handler.getRPPlayer(p);
+                RPPlayer rpPlayer = handler.getRPPlayer(player);
 
                 if(rpPlayer.getSelectedChar() == id) {
-                    handler.replaceCharacter(plugin, p, rpPlayer, handler);
+                    handler.replaceCharacter(plugin, player, rpPlayer, handler);
                 }
                 rpPlayer.setAmountOfChars(rpPlayer.getAmountOfChars() - 1);
                 try {
@@ -71,17 +71,17 @@ public class ConfirmCharDeletionMenu extends Menu {
                     ex.printStackTrace();
                 }
 
-                handler.deleteCharacter(p, playerMenuUtility.getData("charid", Integer.class));
+                handler.deleteCharacter(player, playerMenuUtility.getData("charid", Integer.class));
                 // Персонаж #%d [%s] %s был удален
-                Refactor.sendMessage(p, String.format(plugin.getConfig().getString("char-deleted"), id, charRole, charName));
+                Refactor.sendMessage(player, String.format(plugin.getConfig().getString("char-deleted"), id, charRole, charName));
 
             });
-            p.closeInventory();
+            player.closeInventory();
             return;
         }
 
         if(e.getCurrentItem().getType().equals(Material.RED_CONCRETE)) {
-            p.closeInventory();
+            player.closeInventory();
         }
 
     }

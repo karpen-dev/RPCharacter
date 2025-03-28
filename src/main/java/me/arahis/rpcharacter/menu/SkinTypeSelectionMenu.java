@@ -63,7 +63,7 @@ public class SkinTypeSelectionMenu extends Menu {
             variant = SkinVariant.SLIM;
         }
 
-        p.closeInventory();
+        player.closeInventory();
 
         RPCharacterPlugin plugin = RPCharacterPlugin.getPlugin();
         IDataHandler handler = plugin.getDataHandler();
@@ -74,7 +74,7 @@ public class SkinTypeSelectionMenu extends Menu {
 
             SkinVariant finalVariant = variant;
 
-            PlayerChatInput.PlayerChatInputBuilder<String> builder = new PlayerChatInput.PlayerChatInputBuilder<>(RPCharacterPlugin.getPlugin(), p);
+            PlayerChatInput.PlayerChatInputBuilder<String> builder = new PlayerChatInput.PlayerChatInputBuilder<>(RPCharacterPlugin.getPlugin(), player);
 
             builder.isValidInput((p, str) -> {
                 try {
@@ -152,13 +152,13 @@ public class SkinTypeSelectionMenu extends Menu {
             PlayerChatInput<String> in = builder.build();
 
             in.start();
-            Refactor.sendMessage(p, "&c\"Отмена\"&r, если хотите отменить действие");
+            Refactor.sendMessage(player, "&c\"Отмена\"&r, если хотите отменить действие");
             return;
         }
 
         if(playerMenuUtility.getData("skinsettype").equals("name")) {
 
-            PlayerChatInput.PlayerChatInputBuilder<String> builder = new PlayerChatInput.PlayerChatInputBuilder<>(RPCharacterPlugin.getPlugin(), p);
+            PlayerChatInput.PlayerChatInputBuilder<String> builder = new PlayerChatInput.PlayerChatInputBuilder<>(RPCharacterPlugin.getPlugin(), player);
 
             builder.isValidInput((p, str) -> {
                 IProperty property = plugin.getSkinsRestorerAPI().getSkinData(str);
@@ -212,7 +212,7 @@ public class SkinTypeSelectionMenu extends Menu {
             PlayerChatInput<String> in = builder.build();
 
             in.start();
-            Refactor.sendMessage(p, "&c\"Отмена\"&r, если хотите отменить действие");
+            Refactor.sendMessage(player, "&c\"Отмена\"&r, если хотите отменить действие");
         }
     }
 
